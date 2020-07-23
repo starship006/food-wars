@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7634753076053518583}
   - component: {fileID: 7634753076053518582}
   - component: {fileID: 7634753076053518584}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FlockAgent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,6 +107,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
