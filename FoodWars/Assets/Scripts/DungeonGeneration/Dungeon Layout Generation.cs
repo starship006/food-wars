@@ -21,17 +21,7 @@ namespace DungeonGeneration {
 
         public static void GenerateDungeonLayout(ref Map map, string seed) {
             DungeonShapeGeneration.GenerateDungeonShape(ref map, seed);
-
-        }
-
-        private static class DungeonShapeGeneration {
-            public static void GenerateDungeonShape(ref Map map, string seed) {
-
-            }
-
-            public static void GenerateGridOfRooms(ref Map map, (int x, int y) location, int size) {
-
-            }
+            
         }
 
         // Get the number rooms of certain types in an nxn square centered at some location 
@@ -49,6 +39,16 @@ namespace DungeonGeneration {
                 }
             }
             return count;
+        }
+
+        private static class DungeonShapeGeneration {
+            public static void GenerateDungeonShape(ref Map map, string seed) {
+
+            }
+
+            public static void GenerateGridOfRooms(ref Map map, (int x, int y) location, int size) {
+
+            }
         }
     }
 }
