@@ -1,54 +1,65 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace DungeonGeneration {
     public static class DungeonLayoutGeneration {
-        public enum RoomTypes {
-            EmptyRoom, Wall, Enemies, Treasure, MiniBoss, Special
+        public enum Tile {
+            Wall, Enemies, Treasure, MiniBoss, Special
         }
 
-        public struct Map {
-            public RoomTypes[,] rooms;
+        public static Tile[,] GenerateDungeonLayout(string seed) {
+            (int width, int height) =  (9, 9);
+            Tile[,] map = new Tile[width, height];
 
-            public readonly int width;
-            public readonly int height;
+            (int centerx, int centery) = ((width+1)/2, (height+1)/2);
 
-            public Map(int width,int height) {
-                this.width = width;
-                this.height = height;
-                this.rooms = new RoomTypes[width,height];
-            }
-        }
-
-        public static void GenerateDungeonLayout(ref Map map, string seed) {
-            DungeonShapeGeneration.GenerateDungeonShape(ref map, seed);
-            
-        }
-
-        // Get the number rooms of certain types in an nxn square centered at some location 
-        static int CountNeighborsOfTypes(in Map map, (int x, int y) location, int distance, params RoomTypes[] roomTypes) {
-            int count = 0;
-            for (int neighbourX = location.x - distance; neighbourX <= location.x + distance; neighbourX++) {
-                for (int neighbourY = location.y - distance; neighbourY <= location.y + distance; neighbourY++) {
-                    if ((neighbourX, neighbourY) == location) continue;
-                    if (neighbourX >= 0 && neighbourX < map.width && neighbourY >= 0 && neighbourY < map.height) {
-                        count += roomTypes.Contains(map.rooms[neighbourX, neighbourY]) ? 1 : 0;
-                    } else {
-                        // Edges are counted as walls
-                        count++;
-                    }
+            // Generate a 3x3 grid of rooms in the middle of the map
+            for (int neighbourX = centerx-1; neighbourX <= centerx+1; neighbourX++) {
+                for (int neighbourY = centery-1; neighbourY <= centery+1; neighbourY++) {
+                    map[neighbourX, neighbourY] = Tile.Enemies;
                 }
             }
-            return count;
-        }
 
-        private static class DungeonShapeGeneration {
-            public static void GenerateDungeonShape(ref Map map, string seed) {
+            // Pick a random spot on the perimeter of the square and add a 2x2 square on top for variation
+            (int, int)[] visited = new (int, int)[3];
+            for (int index = 0; index<3; index++) {
+                (int x, int y) = (0, 0);
+                #region Pick a random point on the perimeter of the 3x3 square
+                {
+                    int perimeter = 4*3 - 4;
+                    int randomNumber = new System.Random(seed.GetHashCode()).Next(0, perimeter-1);
 
+                    if (randomNumber==0) {
+                        (x, y) = (centerx-1, centery-1);
+                    } else {
+                        for (int i = centerx-1; i<=centerx+1; i++) {
+                            for (int j = centery-1; j<=centery+1; j++) {
+                                if (i==centerx-1 || i==centerx+1 || j==centery-1 || j==centery+1) randomNumber--;
+                                if (randomNumber==0) (x, y) = (i, j);
+                            }
+                        }
+                    }
+                }
+                #endregion
+
+                if (visited.Contains((x,y))) {
+                    index--;
+                    continue;
+                }
+                visited[index] = (x,y);
+
+                if (map[x-1, y] == Tile.Wall) {
+                    map[x-1, y] = Tile.Enemies;
+                    map[x, y+1] = Tile.Enemies;
+                    map[x-1, y+1] = Tile.Enemies;
+                } else {
+                    map[x+1, y] = Tile.Enemies;
+                    map[x, y+1] = Tile.Enemies;
+                    map[x+1, y+1] = Tile.Enemies;
+                }
             }
 
-            public static void GenerateGridOfRooms(ref Map map, (int x, int y) location, int size) {
-
-            }
+            return map;
         }
     }
 }
