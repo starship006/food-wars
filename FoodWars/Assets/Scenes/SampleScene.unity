@@ -239,6 +239,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7078180963564616688}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &50008455 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7078180964313812041, guid: 7cfca7c57bf04c54b8f757bb4b151ee3,
+    type: 3}
+  m_PrefabInstance: {fileID: 7078180963564616688}
+  m_PrefabAsset: {fileID: 0}
 --- !u!61 &50008456
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3671,6 +3677,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1948395646}
   - component: {fileID: 1948395645}
+  - component: {fileID: 1948395647}
   m_Layer: 0
   m_Name: AStarPathfinding
   m_TagString: Untagged
@@ -3710,6 +3717,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1948395647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948395644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 294d0b363d6b3684084290c863765403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seeker: {fileID: 1665757971}
+  target: {fileID: 50008455}
 --- !u!1 &2029533953
 GameObject:
   m_ObjectHideFlags: 0
