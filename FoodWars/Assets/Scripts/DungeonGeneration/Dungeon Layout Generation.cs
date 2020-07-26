@@ -1,54 +1,92 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Console = UnityEngine.Debug;
 
 namespace DungeonGeneration {
     public static class DungeonLayoutGeneration {
-        public enum RoomTypes {
-            EmptyRoom, Wall, Enemies, Treasure, MiniBoss, Special
+        public enum Tile {
+            Wall, Enemies, MiniBoss, StartEnd
         }
 
-        public struct Map {
-            public RoomTypes[,] rooms;
+        public static Tile[,] GenerateDungeonLayout(string seed) {
+            int width = 11;
+            int height = 11;
 
-            public readonly int width;
-            public readonly int height;
+            int centerx = width/2 + 1;
+            int centery = height/2 + 1;
 
-            public Map(int width,int height) {
-                this.width = width;
-                this.height = height;
-                this.rooms = new RoomTypes[width,height];
-            }
-        }
-
-        public static void GenerateDungeonLayout(ref Map map, string seed) {
-            DungeonShapeGeneration.GenerateDungeonShape(ref map, seed);
+            Tile[,] map = new Tile[width, height];
+            int borderLength = 0;
             
-        }
-
-        // Get the number rooms of certain types in an nxn square centered at some location 
-        static int CountNeighborsOfTypes(in Map map, (int x, int y) location, int distance, params RoomTypes[] roomTypes) {
-            int count = 0;
-            for (int neighbourX = location.x - distance; neighbourX <= location.x + distance; neighbourX++) {
-                for (int neighbourY = location.y - distance; neighbourY <= location.y + distance; neighbourY++) {
-                    if ((neighbourX, neighbourY) == location) continue;
-                    if (neighbourX >= 0 && neighbourX < map.width && neighbourY >= 0 && neighbourY < map.height) {
-                        count += roomTypes.Contains(map.rooms[neighbourX, neighbourY]) ? 1 : 0;
-                    } else {
-                        // Edges are counted as walls
-                        count++;
+            for (int x = centerx-1; x <= centerx+1; x++) {
+                for (int y = centery-1; y <= centery+1; y++) {
+                    map[x, y] = Tile.Enemies;
+                    if(x!=y) {
+                        borderLength++;
                     }
                 }
             }
-            return count;
-        }
 
-        private static class DungeonShapeGeneration {
-            public static void GenerateDungeonShape(ref Map map, string seed) {
+            System.Random random = new System.Random(seed.GetHashCode());
+            for (int i = 0; i<3; i++) {
+                int r = random.Next(1, borderLength);
+                for(int x=1; x<width-1; x++) {
+                    for(int y=1; y<height-1; y++) {
+                        string edges = "";
+                        edges += (map[x-1, y] == Tile.Wall) ? "l" : "";
+                        edges += (map[x+1, y] == Tile.Wall) ? "r" : "";
+                        edges += (map[x, y+1] == Tile.Wall) ? "u" : "";
+                        edges += (map[x, y-1] == Tile.Wall) ? "d" : "";
+                        if (edges.Length != 0 && edges.Length != 4 && map[x,y] != Tile.Wall) r--;
+                        if (r==0) {
+                            Console.Log(edges.Length);
 
+                            int xadd = (x<centerx) ? -1 : 1;
+                            int yadd = (y<centery) ? -1 : 1;
+
+                            switch (edges.Length) {
+                                case 1:
+                                    bool extrude = random.Next(0, 2) < 1;
+                                    if(extrude) {
+                                        switch (edges) {
+                                            case "l": map[x-1, y] = Tile.Enemies; break;
+                                            case "r": map[x+1, y] = Tile.Enemies; break;
+                                            case "u": map[x, y+1] = Tile.Enemies; break;
+                                            case "d": map[x, y-1] = Tile.Enemies; break;
+                                        };
+                                        borderLength++;
+                                        break;
+                                    } else {
+                                        goto case 2;
+                                    }
+                                case 2:
+                                    map[x, y+yadd] = Tile.Enemies;
+                                    map[x+xadd, y] = Tile.Enemies;
+                                    map[x+xadd, y+yadd] = Tile.Enemies;
+                                    borderLength+=3;
+                                    break;
+                                case 3:
+                                    if(edges.Contains("lr")) {
+                                        edges = string.Join("", edges.Split('l', 'r'));
+                                    } else {
+                                        edges = string.Join("", edges.Split('u', 'd'));
+                                    }
+                                    
+                                    switch (edges) {
+                                        case "l": map[x-1, y] = Tile.Enemies; break;
+                                        case "r": map[x+1, y] = Tile.Enemies; break;
+                                        case "u": map[x, y+1] = Tile.Enemies; break;
+                                        case "d": map[x, y-1] = Tile.Enemies; break;
+                                    };
+                                    borderLength++;
+                                    break;
+                            }
+                        }
+                    }
+                }
             }
 
-            public static void GenerateGridOfRooms(ref Map map, (int x, int y) location, int size) {
-
-            }
+            return map;
         }
     }
 }

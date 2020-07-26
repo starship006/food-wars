@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Console = UnityEngine.Debug;
 using DLG = DungeonGeneration.DungeonLayoutGeneration;
 
 [Serializable]
@@ -10,20 +11,18 @@ public class ShowDungeon : MonoBehaviour {
     GameObject dungeonRoomVisualPrefab;
 
     void Start() {
-        int width = 50;
-        int height = 25;
+        Console.Log("Generating Dungeon");
 
-        DLG.Map map = new DLG.Map(width, height);
-        DLG.GenerateDungeonLayout(ref map, Time.time+"");
+        var map = DLG.GenerateDungeonLayout(Time.time+"");
 
         DrawDungeon(in map);
     }
 
-    void DrawDungeon(in DLG.Map map) {
-        for(int x = 0; x < map.width; x++) {
-            for (int y = 0; y < map.height; y++) {
-                UnityEngine.Color color = (map.rooms[x,y] == DLG.RoomTypes.Wall) ? UnityEngine.Color.black : UnityEngine.Color.white;
-                Vector3 pos = new Vector3(-0.5f * (map.width - 1) + x, -0.5f * (map.height - 1) + y, 0);
+    void DrawDungeon(in DLG.Tile[,] map) {
+        for(int x = 0; x < map.GetLength(0); x++) {
+            for (int y = 0; y < map.GetLength(1); y++) {
+                UnityEngine.Color color = (map[x,y] == DLG.Tile.Wall) ? UnityEngine.Color.black : UnityEngine.Color.white;
+                Vector3 pos = new Vector3(-0.5f * (map.GetLength(0) - 1) + x, -0.5f * (map.GetLength(1) - 1) + y, 0);
                 GameObject roomVisual = Instantiate(dungeonRoomVisualPrefab, pos, Quaternion.identity);
                 roomVisual.transform.parent = this.transform;
                 roomVisual.GetComponent<SpriteRenderer>().color = color;

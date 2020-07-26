@@ -3,12 +3,12 @@
 namespace DungeonGeneration {
     public static class RoomGeneration {
         public enum TileTypes {
-            Empty, Wall, Chest
+            Wall, Empty, Chest
         }
         
         public struct Room {
             public TileTypes[,] tiles;
-
+        
             public readonly int width;
             public readonly int height;
 
@@ -20,12 +20,13 @@ namespace DungeonGeneration {
         }
 
         public static void GenerateRoom(ref Room room, string seed) {
-            RoomShapeGeneration.CellularAutomataGeneration.GenerateRoomShape(ref room, seed);
+            RoomShapeGeneration.GenerateRoomShape(ref room, seed);
 
         }
 
         // Get the number rooms of certain types in an nxn square centered at some location 
-        static int CountNeighborsOfTypes(in Room room, (int x, int y) location, int distance, params TileTypes[] tileTypes) {
+        static int CountNeighborsOfTypes(in Room room, (int x, int y) location, int size, params TileTypes[] tileTypes) {
+            int distance = (size-1)/2;
             int count = 0;
             for (int neighbourX = location.x - distance; neighbourX <= location.x + distance; neighbourX++) {
                 for (int neighbourY = location.y - distance; neighbourY <= location.y + distance; neighbourY++) {
@@ -43,41 +44,37 @@ namespace DungeonGeneration {
 
         // Any sub classes of this class hsould have the GenerateRoomShape(ref Room room, string seed) method
         static class RoomShapeGeneration {
-            public static class CellularAutomataGeneration {
-                const int randomFillPercent = 70;
-                const int smoothingPasses = 3;
+            const int randomFillPercent = 70;
+            const int smoothingPasses = 3;
+            
+            public static void GenerateRoomShape(ref Room room, string seed) { 
+                Randomize(ref room, seed);
 
-                public static void GenerateRoomShape(ref Room room, string seed) {
-                    Randomize(ref room, seed);
-
-                    for (int i = 0; i<smoothingPasses; i++) {
-                        Smoothen(ref room);
-                    }
+                for (int i = 0; i<smoothingPasses; i++) {
+                    Smoothen(ref room);
                 }
+            }
 
-                // Fill room randomly with rooms and walls
-                static void Randomize(ref Room room, string seed) {
-                    System.Random pseudoRandom = new System.Random(seed.GetHashCode());
-                    for (int x = 0; x < room.width; x++) {
-                        for (int y = 0; y < room.height; y++) {
-                            room.tiles[x, y] = (pseudoRandom.Next(0, 100) < randomFillPercent) ? TileTypes.Empty : TileTypes.Wall;
-                        }
-                    }
-                }
-
-                // Smooth out the randomness to form a blob
-                static void Smoothen(ref Room room) {
-                    for (int x = 0; x < room.width; x++) {
-                        for (int y = 0; y < room.height; y++) {
-                            int neighbourWallTiles = CountNeighborsOfTypes(in room, (x, y), 1, TileTypes.Wall);
-
-                            // Cellular automata rules
-                            if (neighbourWallTiles > 4) room.tiles[x, y] = TileTypes.Wall;
-                            else if (neighbourWallTiles < 4) room.tiles[x, y] = TileTypes.Empty;
-                        }
+            static void Randomize(ref Room room, string seed) {
+                System.Random pseudoRandom = new System.Random(seed.GetHashCode());
+                for (int x = 0; x < room.width; x++) {
+                    for (int y = 0; y < room.height; y++) {
+                        room.tiles[x,y] = (pseudoRandom.Next(0, 100) < randomFillPercent) ? TileTypes.Empty : TileTypes.Wall;
                     }
                 }
             }
+
+            static void Smoothen(ref Room room) {
+                for (int x = 0; x < room.width; x++) {
+                    for (int y = 0; y < room.height; y++) {
+                        int neighbourWallTiles = CountNeighborsOfTypes(in room, (x, y), 3, TileTypes.Wall);
+
+                        if (neighbourWallTiles > 4) room.tiles[x, y] = TileTypes.Wall;
+                        else if (neighbourWallTiles < 4) room.tiles[x, y] = TileTypes.Empty;
+                    }
+                }
+            }
+            
         }
     }
 }
