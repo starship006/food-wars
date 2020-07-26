@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
+using Console = UnityEngine.Debug;
 using DLG = DungeonGeneration.DungeonLayoutGeneration;
 
 [Serializable]
@@ -11,6 +11,8 @@ public class ShowDungeon : MonoBehaviour {
     GameObject dungeonRoomVisualPrefab;
 
     void Start() {
+        Console.Log("Generating Dungeon");
+
         var map = DLG.GenerateDungeonLayout(Time.time+"");
 
         DrawDungeon(in map);
