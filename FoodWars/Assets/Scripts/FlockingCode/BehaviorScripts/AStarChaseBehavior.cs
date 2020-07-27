@@ -18,7 +18,6 @@ public class AStarChaseBehavior : FlockBehavior
             List<Node> path = Pathfinder.instance.FindPath(agent.transform.position, inGameTarget.transform.position);
             if(path.Count > 1)
             {
-                 Debug.Log("No error");
                  Vector3 direction = path[1].worldPosition - path[0].worldPosition;
                  return direction.normalized;
             }         

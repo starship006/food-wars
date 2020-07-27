@@ -2485,7 +2485,7 @@ GameObject:
   - component: {fileID: 1665757972}
   m_Layer: 8
   m_Name: player_0
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3701,7 +3701,7 @@ MonoBehaviour:
   unwalkableMask:
     serializedVersion: 2
     m_Bits: 512
-  gridWorldSize: {x: 30, y: 30}
+  gridWorldSize: {x: 90, y: 30}
   nodeRadius: 0.5
 --- !u!4 &1948395646
 Transform:

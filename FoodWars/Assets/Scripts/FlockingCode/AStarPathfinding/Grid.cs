@@ -16,24 +16,30 @@ public class Grid : MonoBehaviour
     int gridSizeX, gridSizeY;  //number of nodes within the grid
     Vector2 worldBottomLeft;
 
+    public int gridMaxSize{
+        get {return gridSizeX* gridSizeY;
+}    
+    }
     private void Start()
     {
         nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
-        CreateGrid();
+        CreateGrid(GameObject.FindGameObjectWithTag("Player").transform);
+        GameEvents.instance.onSecondPassed += OnSecondPassed;
     }
 
-    private void Update()
+    private void OnSecondPassed()
     {
-       // CreateGrid();
+        CreateGrid(GameObject.FindGameObjectWithTag("Player").transform);
     }
 
 
-    public void CreateGrid()
+    public void CreateGrid(Transform origin)
     {
+        Debug.Log("CreateGrid called");
         grid = new Node[gridSizeX, gridSizeY];
-        worldBottomLeft = (Vector2) transform.position - Vector2.right * gridWorldSize.x / 2 - Vector2.up * gridWorldSize.y / 2;
+        worldBottomLeft = (Vector2) origin.position - Vector2.right * gridWorldSize.x / 2 - Vector2.up * gridWorldSize.y / 2;
 
         for (int x = 0; x < gridSizeX; x++)
         {
